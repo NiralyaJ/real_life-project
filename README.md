@@ -90,87 +90,89 @@ File Handling Module
 ## Python Program
 
 ```
-python
+import tkinter as tk
+from tkinter import messagebox
 import json
 import os
 
 FILE_NAME = "attendance.json"
 
+# Load data
 def load_data():
     if os.path.exists(FILE_NAME):
         with open(FILE_NAME, "r") as file:
             return json.load(file)
     return []
 
-def save_data(data):
+# Save data
+def save_data():
     with open(FILE_NAME, "w") as file:
         json.dump(data, file)
 
-def add_student(data):
-    name = input("Enter student name: ")
-    data.append({"name": name, "present": False})
-    save_data(data)
-    print("Student added successfully!")
-
-def view_students(data):
-    if not data:
-        print("No students found.")
-        return
-
-    print("\nStudent List:")
-    for i, s in enumerate(data):
+# Refresh listbox
+def refresh_list():
+    listbox.delete(0, tk.END)
+    for s in data:
         status = "Present" if s["present"] else "Absent"
-        print(f"{i+1}. {s['name']} - {status}")
+        listbox.insert(tk.END, f"{s['name']} - {status}")
 
-def mark_attendance(data):
-    view_students(data)
+# Add student
+def add_student():
+    name = entry.get()
+    if name == "":
+        messagebox.showwarning("Warning", "Enter a name")
+        return
+    data.append({"name": name, "present": False})
+    save_data()
+    refresh_list()
+    entry.delete(0, tk.END)
+
+# Mark attendance
+def mark_present():
     try:
-        num = int(input("Enter student number to mark present: "))
-        data[num-1]["present"] = True
-        save_data(data)
-        print("Attendance marked!")
+        index = listbox.curselection()[0]
+        data[index]["present"] = True
+        save_data()
+        refresh_list()
     except:
-        print("Invalid input!")
+        messagebox.showerror("Error", "Select a student")
 
-def delete_student(data):
-    view_students(data)
+# Delete student
+def delete_student():
     try:
-        num = int(input("Enter student number to delete: "))
-        removed = data.pop(num-1)
-        save_data(data)
-        print(f"Deleted student: {removed['name']}")
+        index = listbox.curselection()[0]
+        removed = data.pop(index)
+        save_data()
+        refresh_list()
+        messagebox.showinfo("Deleted", f"{removed['name']} removed")
     except:
-        print("Invalid input!")
+        messagebox.showerror("Error", "Select a student")
 
-def main():
-    data = load_data()
+# Main window
+root = tk.Tk()
+root.title("Attendance Tracker")
+root.geometry("400x400")
 
-    while True:
-        print("\n==== ATTENDANCE TRACKER ====")
-        print("1. Add Student")
-        print("2. View Students")
-        print("3. Mark Attendance")
-        print("4. Delete Student")
-        print("5. Exit")
+data = load_data()
 
-        choice = input("Enter your choice: ")
+# UI Elements
+tk.Label(root, text="Enter Student Name").pack()
 
-        if choice == "1":
-            add_student(data)
-        elif choice == "2":
-            view_students(data)
-        elif choice == "3":
-            mark_attendance(data)
-        elif choice == "4":
-            delete_student(data)
-        elif choice == "5":
-            print("Goodbye!")
-            break
-        else:
-            print("Invalid choice!")
+entry = tk.Entry(root)
+entry.pack()
 
-if __name__ == "__main__":
-    main()
+tk.Button(root, text="Add Student", command=add_student).pack(pady=5)
+
+listbox = tk.Listbox(root, width=40)
+listbox.pack(pady=10)
+
+tk.Button(root, text="Mark Present", command=mark_present).pack(pady=5)
+tk.Button(root, text="Delete Student", command=delete_student).pack(pady=5)
+
+# Initial load
+refresh_list()
+
+root.mainloop()
 ```
 
 ## OUTPUT
