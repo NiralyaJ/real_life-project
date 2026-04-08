@@ -1,4 +1,4 @@
-# Library Book Issue Tracker using Python (Tkinter)
+# Library Book Issue Tracker using Python 
 
 ## Description
 The Library Book Issue Tracker is a simple and practical system developed using Python with a Graphical User Interface (GUI) using Tkinter. It allows users to record, manage, and track library book issue details such as book name, student name, and return status.
