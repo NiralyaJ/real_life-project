@@ -1,69 +1,75 @@
-# Student Attendance Tracker using Python
+# Library Book Issue Tracker using Python (Tkinter)
 
 ## Description
-The Student Attendance Tracker is a simple and practical system developed using Python. It allows users to record, manage, and track student attendance through a Command-Line Interface (CLI).
+The Library Book Issue Tracker is a simple and practical system developed using Python with a Graphical User Interface (GUI) using Tkinter. It allows users to record, manage, and track library book issue details such as book name, student name, and return status.
 
-This project helps teachers or users maintain attendance records efficiently and reduces manual errors. It demonstrates how programming concepts can be used to solve real-world problems like attendance management and record keeping.
+This project helps users efficiently manage library records and reduces manual errors. It demonstrates how Python programming and GUI development can be used to solve real-world problems like library management and record tracking.
 
 ---
 
 ## Objective
-
 The main objectives of this project are:
 
-- To help users manage student attendance efficiently  
-- To understand file handling in Python  
+- To help users manage library book records efficiently  
+- To understand file handling using JSON in Python  
 - To implement CRUD operations (Create, Read, Update, Delete)  
-- To develop a real-time usable application  
-- To understand modular programming  
+- To develop a real-time GUI-based application  
+- To understand modular programming using functions  
 
 The program is divided into functions such as:
-- add_student()  
-- mark_attendance()  
-- view_attendance()  
-- delete_student()  
+
+- `add_record()`  
+- `mark_returned()`  
+- `refresh_list()`  
+- `delete_record()`  
 
 This improves code readability, maintenance, and reusability.
 
-The project also helps in understanding:
-- Data structures  
-- File handling  
-- Error handling  
+---
+
+## Concepts Covered
+
+This project helps in understanding:
+
+- Data structures (lists and dictionaries)  
+- File handling using JSON  
+- GUI development using Tkinter  
+- Error handling using try-except  
 - Logical thinking and debugging  
 
 ---
 
 ## Features
 
-Attendance Management  
-- Add new students  
-- Mark attendance (Present/Absent)  
-- View attendance records  
-- Delete student records  
+### Library Management
+- Add new book issue records  
+- Track which student borrowed which book  
+- Mark books as Returned  
+- Delete records  
 
-Data Persistence  
-- Data stored in a file (attendance.json)  
-- Data remains after closing the program  
+### Data Persistence
+- Data stored in a file (`library.json`)  
+- Data remains saved even after closing the application  
 
-Error Handling  
+### Error Handling
 - Handles invalid inputs  
-- Prevents program crash  
+- Prevents application crash  
+- Displays user-friendly error messages  
 
-Attendance Tracking  
-- Displays attendance status  
-- Easy monitoring of student records  
+### Record Tracking
+- Displays issue/return status  
+- Easy monitoring of library records  
 
 ---
 
 ## Technologies Used
 
-Programming Language: Python  
-
-Libraries Used:  
-- json (for storing data)  
-- os (for file handling)  
-
-Interface: Command Line Interface (CLI)  
+- **Programming Language:** Python  
+- **Libraries Used:**  
+  - `tkinter` (for GUI)  
+  - `json` (for data storage)  
+  - `os` (for file handling)  
+- **Interface:** Graphical User Interface (GUI)  
 
 ---
 
@@ -71,21 +77,24 @@ Interface: Command Line Interface (CLI)
 
 The application follows a modular structure:
 
-Main Module  
-- Displays menu  
-- Takes user input  
+### Main Module
+- Creates the main window  
+- Handles user interface elements  
 
-Attendance Module  
-- Add student  
-- Mark attendance  
-- View attendance  
-- Delete student  
+### Library Module
+- Add book record  
+- Mark book as returned  
+- View records (Listbox display)  
+- Delete record  
 
-File Handling Module  
-- Load data from file  
-- Save data to file  
+### File Handling Module
+- Load data from JSON file  
+- Save data to JSON file  
 
 ---
+
+## File Structure
+
 
 ## Python Program
 
@@ -95,7 +104,7 @@ from tkinter import messagebox
 import json
 import os
 
-FILE_NAME = "attendance.json"
+FILE_NAME = "library.json"
 
 # Load data
 def load_data():
@@ -109,67 +118,80 @@ def save_data():
     with open(FILE_NAME, "w") as file:
         json.dump(data, file)
 
-# Refresh listbox
+# Refresh list
 def refresh_list():
     listbox.delete(0, tk.END)
-    for s in data:
-        status = "Present" if s["present"] else "Absent"
-        listbox.insert(tk.END, f"{s['name']} - {status}")
+    for item in data:
+        status = "Returned" if item["returned"] else "Issued"
+        listbox.insert(tk.END, f"{item['book']} - {item['student']} ({status})")
 
-# Add student
-def add_student():
-    name = entry.get()
-    if name == "":
-        messagebox.showwarning("Warning", "Enter a name")
+# Add record
+def add_record():
+    book = book_entry.get()
+    student = student_entry.get()
+
+    if book == "" or student == "":
+        messagebox.showwarning("Warning", "Enter all fields")
         return
-    data.append({"name": name, "present": False})
+
+    data.append({
+        "book": book,
+        "student": student,
+        "returned": False
+    })
+
     save_data()
     refresh_list()
-    entry.delete(0, tk.END)
 
-# Mark attendance
-def mark_present():
+    book_entry.delete(0, tk.END)
+    student_entry.delete(0, tk.END)
+
+# Mark as returned
+def mark_returned():
     try:
         index = listbox.curselection()[0]
-        data[index]["present"] = True
+        data[index]["returned"] = True
         save_data()
         refresh_list()
     except:
-        messagebox.showerror("Error", "Select a student")
+        messagebox.showerror("Error", "Select a record")
 
-# Delete student
-def delete_student():
+# Delete record
+def delete_record():
     try:
         index = listbox.curselection()[0]
         removed = data.pop(index)
         save_data()
         refresh_list()
-        messagebox.showinfo("Deleted", f"{removed['name']} removed")
+        messagebox.showinfo("Deleted", f"{removed['book']} removed")
     except:
-        messagebox.showerror("Error", "Select a student")
+        messagebox.showerror("Error", "Select a record")
 
 # Main window
 root = tk.Tk()
-root.title("Attendance Tracker")
-root.geometry("400x400")
+root.title("Library Tracker")
+root.geometry("420x450")
 
 data = load_data()
 
-# UI Elements
-tk.Label(root, text="Enter Student Name").pack()
+# UI
+tk.Label(root, text="Book Name").pack()
+book_entry = tk.Entry(root)
+book_entry.pack()
 
-entry = tk.Entry(root)
-entry.pack()
+tk.Label(root, text="Student Name").pack()
+student_entry = tk.Entry(root)
+student_entry.pack()
 
-tk.Button(root, text="Add Student", command=add_student).pack(pady=5)
+tk.Button(root, text="Add Record", command=add_record).pack(pady=5)
 
-listbox = tk.Listbox(root, width=40)
+listbox = tk.Listbox(root, width=45)
 listbox.pack(pady=10)
 
-tk.Button(root, text="Mark Present", command=mark_present).pack(pady=5)
-tk.Button(root, text="Delete Student", command=delete_student).pack(pady=5)
+tk.Button(root, text="Mark as Returned", command=mark_returned).pack(pady=5)
+tk.Button(root, text="Delete Record", command=delete_record).pack(pady=5)
 
-# Initial load
+# Load initial data
 refresh_list()
 
 root.mainloop()
@@ -177,12 +199,14 @@ root.mainloop()
 
 ## OUTPUT
 
-<img width="497" height="496" alt="image" src="https://github.com/user-attachments/assets/1348e57e-9eba-4c3c-9ce3-03f1ab0e2fe3" />
+<img width="516" height="588" alt="image" src="https://github.com/user-attachments/assets/897301d5-36bd-42f1-8159-5dde7f3e694f" />
 
-<img width="606" height="437" alt="image" src="https://github.com/user-attachments/assets/15291f7b-fc88-42fa-b424-816ae57c0bb2" />
+
+<img width="517" height="585" alt="image" src="https://github.com/user-attachments/assets/191045a4-cce2-44fa-900c-dfd4802a7eda" />
+
 
 ## Result
-The Student Attendance Tracker using Python is a useful application for managing student attendance efficiently. It demonstrates important programming concepts such as file handling, modular programming, and data management. This project serves as a foundation for building more advanced academic management systems.
+The Library Book Issue Tracker is a simple yet effective application that demonstrates the use of Python, Tkinter, and JSON for building real-world systems. It improves understanding of GUI development, file handling, and modular programming.
 
 ## Author
 
